@@ -817,7 +817,39 @@
   }
   .reflect-prompt:last-child { border-bottom: none; }
 
-  /* Summary bar */
+  /* Simulator setup fields */
+  .sim-fields-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .sim-field { display: flex; flex-direction: column; gap: 4px; }
+  .sim-field-label {
+    font-size: 10px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: #c97204;
+  }
+  .sim-field-value {
+    font-size: 13px; color: var(--bs-text);
+    line-height: 1.55;
+    background: white;
+    border: 1px solid var(--bs-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    white-space: pre-wrap;
+  }
+  .sim-q { margin-bottom: 4px; }
+  .sim-criteria-item { margin-bottom: 8px; }
+  .sim-criteria-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--bs-text); margin-bottom: 3px;
+  }
+  .sim-criteria-detail {
+    font-size: 13px; color: var(--bs-muted);
+    line-height: 1.5;
+    background: white;
+    border: 1px solid var(--bs-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+
+
   .pathway-summary-bar {
     display: flex; gap: 8px; flex-wrap: wrap;
     padding: 12px 16px;
@@ -1137,6 +1169,8 @@ const SYSTEM_PROMPT = `You are Pathway Pete, a Bodyswaps Learning Design Expert.
 ## YOUR TASK
 Based on the user's submission, build a structured learning pathway using ONLY content from the Bodyswaps library listed below. Output a pathway in the exact JSON format specified.
 
+IMPORTANT — LENGTH OVERRIDE RULE: If the user's additional context explicitly requests AI roleplays, simulators, or practice scenarios, you MUST include at least one simulator even if they selected "Short Sprint". A short pathway with a simulator is better than one without.
+
 ---
 
 ## CONTENT LIBRARY
@@ -1144,69 +1178,43 @@ Based on the user's submission, build a structured learning pathway using ONLY c
 ### MODULES (scripted, fixed content – cannot be adapted)
 Only use modules from this list:
 
-1. **Active Listening** | 15 mins | Identify good/bad listening, use thoughtful questions, summarising technique. Characters: Dave, Amy. Good for: communication, empathy, healthcare, workplace.
-
-2. **Clear Communications** | 15 mins | Build a compelling case, avoid communication pitfalls, give convincing explanations. Characters: Daniel. Good for: workplace communication, assertiveness.
-
+1. **Active Listening** | 15 mins | Identify good/bad listening, use thoughtful questions, summarising technique. Good for: communication, empathy, healthcare, workplace.
+2. **Clear Communications** | 15 mins | Build a compelling case, avoid communication pitfalls, give convincing explanations. Good for: workplace communication, assertiveness.
 3. **Workplace Communication** | 50 mins | Game show format. Topics: non-verbal comms, clarity & concision, active listening, persuasion. Good for: general comms, early careers, employability.
-
 4. **Talented Teamwork** | 25 mins | Team player styles, team-busting behaviours, collaborative relationships. Good for: teamwork, collaboration, management.
-
 5. **Negotiation and Conflict Management: Laying the Groundwork** | 25 mins | Small talk, rapport building, active listening in negotiation contexts. Good for: negotiation, conflict, management.
-
 6. **Negotiation and Conflict Management: Approach and Mindset** | 25 mins | Managing emotions, win-win mindset, understanding others. Good for: negotiation, conflict, emotional intelligence.
-
 7. **Negotiation and Conflict Management: Gaining Influence and Value** | 25 mins | Influencing without power, tangible/intangible interests, trading issues. Good for: negotiation, influence, leadership.
-
-8. **Public Speaking and Presentation Skills** | ~40 mins | Composure, body language, voice (inflection, intonation, volume, pace), charisma, structure, simulator. Good for: presentation skills, communication, confidence.
-
+8. **Public Speaking and Presentation Skills** | ~40 mins | Composure, body language, voice, charisma, structure. Good for: presentation skills, communication, confidence.
 9. **Managing Interview Anxiety** | 15 mins | Guided meditation, grounding techniques, identifying feelings. Good for: employability, confidence, wellbeing.
-
 10. **Landing the Perfect Job** | 20 mins | Crafting compelling answers, identifying strengths and non-negotiables. Good for: employability, job readiness.
-
 11. **Two Strategies for Answering Almost Any Question (CAR/STAR)** | 20 mins | Story bank, CAR technique, STAR technique. Good for: employability, interview skills.
-
-12. **Bias as a Barrier** | 25 mins | Unconscious bias, challenging assumptions, applying the stop/switch/challenge/counter strategy. Good for: DEI, inclusion, awareness.
-
+12. **Bias as a Barrier** | 25 mins | Unconscious bias, challenging assumptions, stop/switch/challenge/counter strategy. Good for: DEI, inclusion, awareness.
 13. **Navigating Microaggressions** | 25 mins | Types of microaggression, stepping up, standing up to microaggressions. Good for: DEI, allyship, inclusion.
-
 14. **Recognising Privilege** | 25 mins | Privilege and race, identifying privilege, myth of meritocracy. Good for: DEI, inclusion, awareness.
-
-15. **Navigating Angry Conversations (Healthcare)** | 30 mins | Calming techniques, depersonalisation, identifying anger signals, defusing anger with empathy. Good for: healthcare, de-escalation, patient comms.
-
+15. **Navigating Angry Conversations (Healthcare)** | 30 mins | Calming techniques, depersonalisation, identifying anger signals, defusing with empathy. Good for: healthcare, de-escalation, patient comms.
 16. **Communicating in a Person-Centred Way: Acting with Empathy** | 20 mins | Dignity, promoting respect, involving family members, demonstrating empathy. Good for: healthcare, care settings.
-
 17. **Communicating in a Person-Centred Way: Getting to Know Each Individual** | 20 mins | Person-centred approach, curiosity, unique identity, individuality. Good for: healthcare, care settings.
-
 18. **Growth Mindset and Resilience** | 60 mins | Purpose statement, best future self, resilience, recovering from setbacks, positive self-talk. Good for: employability, wellbeing, early careers.
-
-19. **TeamSTEPPS: Call-Out** | 15 mins | Discover, see in action, practice call-out communication strategy. Good for: healthcare, clinical teamwork.
-
+19. **TeamSTEPPS: Call-Out** | 15 mins | Practice call-out communication strategy. Good for: healthcare, clinical teamwork.
 20. **TeamSTEPPS: Check-Back** | 15 mins | Explore and practice check-back communication. Good for: healthcare, clinical teamwork.
-
 21. **TeamSTEPPS: CUS** | 15 mins | Understanding CUS formula, escalating concerns. Good for: healthcare, clinical teamwork, patient safety.
-
 22. **TeamSTEPPS: SBAR** | 15 mins | SBAR structure, practice using SBAR. Good for: healthcare, handovers, clinical communication.
-
 23. **TeamSTEPPS: Task Assistance** | 15 mins | Supportive and unsupportive behaviors, demonstrating task assistance. Good for: healthcare, clinical teamwork.
-
 24. **Using Values to Guide Actions** | 25 mins | Values in workplace, values-driven behaviours, navigating difficult conversations. Good for: healthcare, organisational culture.
-
 25. **Verbal De-escalation of Responsive Behaviours** | 25 mins | De-escalation with Nancy (Alzheimer's), de-escalation with Johnny (autism). Good for: care homes, residential care.
 
 ---
 
 ### EXERCISES (scripted, fixed content – cannot be adapted)
-Only use exercises from this list:
-
-- **Guided Meditation** | 5 mins | Power pose and breathing for calm before difficult situations. Category: Wellbeing/Confidence.
-- **Identifying Strengths and Non-Negotiables** | 5 mins | Mini personality test, identify strengths. Category: Self-awareness/Employability.
+- **Guided Meditation** | 5 mins | Power pose and breathing for calm. Category: Wellbeing/Confidence.
+- **Identifying Strengths and Non-Negotiables** | 5 mins | Mini personality test. Category: Self-awareness/Employability.
 - **Reflecting on Challenging Patient Interactions** | 5 mins | Freeform reflection on angry encounters. Category: Healthcare.
 - **Personal Calming Techniques** | 5 mins | Three calming techniques for hostile situations. Category: Healthcare/Wellbeing.
 - **Understanding Different Types of Team Players** | 8 mins | Identify own team player style. Category: Teamwork.
 - **Good and Bad Teamwork** | 5 mins | Identify team-busting behaviours. Category: Teamwork.
 - **Learn How to Collaborate with Others** | 8 mins | Participate in a team meeting. Category: Teamwork.
-- **Preparing Interview Stories** | 8 mins | Build a story bank, what makes a good interview story. Category: Employability.
+- **Preparing Interview Stories** | 8 mins | Build a story bank. Category: Employability.
 - **Crafting Interview Answers with CAR** | 8 mins | Learn and apply CAR technique. Category: Employability.
 - **Crafting Interview Answers with STAR** | 8 mins | Learn and apply STAR technique. Category: Employability.
 - **Public Speaking: Grounding Yourself** | 5 mins | 5-4-3-2-1 grounding technique. Category: Confidence/Public speaking.
@@ -1217,42 +1225,114 @@ Only use exercises from this list:
 
 ---
 
-### AI SIMULATORS (fully customisable roleplays with AI characters)
+### AI SIMULATORS — 8 types (fully customisable)
 
-1. **Job Interview Roleplay** | 10–30 mins | AI interviewer, customisable job role, company, questions. Learner gets personalised feedback. Good for: employability, interview practice.
-   - Customisation needed: Job role, company name, interviewer personality (friendly/neutral/tough), number of questions, CAR or STAR structure.
-
-2. **De-escalation Roleplay** | 10–15 mins | AI-powered distressed/angry individual. Learner practices verbal de-escalation. Personalised feedback at end. Good for: healthcare, customer service, conflict management.
-   - Customisation needed: AI role (who is the distressed person), learner role, specific scenario context, environment.
-
-3. **Professional Conversations / Active Listening Roleplay** | 10–20 mins | Open conversation simulator. Flexible – can be set up as 1-to-1s, feedback conversations, coaching, sales conversations, negotiation practice, team collaboration, media interviews, debate.
-   - Customisation needed: Conversation type, interviewer/conversation partner role, scenario details, specific focus questions.
-   
-4. **Public Speaking Simulator** | 15 mins | Learner delivers a speech on any topic to a virtual audience. Analytics on pace, eye contact. Good for: presentation skills, confidence.
+For each simulator you include in a pathway, populate the simulatorFields object with the key fields below. Write specific, realistic content tailored to the learner group — not generic placeholders.
 
 ---
 
-### QUIZZES (you create these, based on the examples in the knowledge base)
-Quizzes have 4–6 multiple choice questions with one correct answer. Topics must align with the pathway content. Duration: 5 mins.
+**1. Job Interview Roleplay** | 10–30 mins
+Good for: employability, interview practice, apprenticeships, early careers.
+Key fields:
+- title: snappy, e.g. "Pitch perfect: interview for [role] at [company]" (max 70 chars)
+- scenario: job title, company name, and 2–3 sentence job description
+- roles: learner = candidate for the role; AI = interviewer (suggest personality: Leon = friendly/easy, Kel = inquisitive/medium, Rach = formal/tough)
+- learnerInstructions: what role they're playing, who they're meeting, what technique to use (CAR or STAR), max 80 words
 
-### QUESTIONNAIRES (open-ended reflection prompts)
-Questionnaires have 3–5 open-ended questions for self-reflection. Duration: 5 mins.
+---
+
+**2. De-escalation Roleplay** | 10–15 mins
+Good for: healthcare, retail, hospitality, customer service, social care, conflict management.
+Key fields:
+- title: e.g. "Bring them down to calm: defuse [character] who [situation]" (max 70 chars)
+- scenario: who the distressed AI character is (name, age, role/situation), what triggered them, and 2–3 background stress factors that have made their day hard
+- roles: learner = the staff member/professional; AI = the distressed person
+- learnerInstructions: their role, who they're speaking to, and that they'll need empathy, active listening and patience — the person won't calm down right away, max 80 words
+
+---
+
+**3. Active Listening in Healthcare Roleplay** | 10–20 mins
+Good for: nursing, allied health, social care, mental health, person-centred care.
+Key fields:
+- title: e.g. "Listen to understand: support [patient name] with [concern]" (max 70 chars)
+- scenario: patient's name, healthcare concern, relevant medical/personal background
+- roles: learner = healthcare professional (specify type); AI = patient
+- learnerInstructions: their role, the patient they're meeting, to use open questions, empathy and paraphrasing, max 80 words
+
+---
+
+**4. Active Listening in the Workplace Roleplay** | 10–20 mins
+Good for: managers, team leads, HR, professional development.
+Key fields:
+- title: e.g. "Hear them out: 1-to-1 with [colleague name] about [topic]" (max 70 chars)
+- scenario: what the AI colleague wants to discuss, their background and current mood
+- roles: learner = colleague or manager; AI = the colleague opening up
+- learnerInstructions: their role, who they're speaking to, skills to use (open questions, empathy, paraphrasing), max 80 words
+
+---
+
+**5. Building Rapport Roleplay** | 10–15 mins
+Good for: employability, social skills, FE/HE students, early careers professionals.
+Peer-to-peer only (student–student or professional–professional).
+Key fields:
+- title: e.g. "Major in mingling: chat with a fellow [subject] student" (max 70 chars)
+- scenario: student type or profession for both learner and AI character; a brief hint about the AI character's personality/interests (written in third person, no pronouns)
+- roles: learner = student or professional; AI = peer (same type — student or professional)
+- learnerInstructions: who they're meeting, that it's a casual getting-to-know-you chat, to find common ground and build natural rapport, max 80 words
+
+---
+
+**6. Open Conversation Roleplay** | 10–20 mins
+Good for: sales, negotiation, management, coaching, feedback, collaboration — any professional conversation scenario.
+Key fields:
+- title: e.g. "Bargain for more: negotiate a pay rise with your manager" (max 70 chars)
+- scenario: the situation, what the learner is trying to achieve, and the AI character's role and personality
+- roles: learner = their professional role and goal; AI = conversation partner (with background and communication style)
+- learnerInstructions: their role, who they're speaking to, the goal of the conversation, and skills to apply, max 80 words
+
+---
+
+**7. Debating Roleplay** | 10–20 mins
+Good for: critical thinking, argumentation, further and higher education, professional development.
+Key fields:
+- title: e.g. "Stand your ground: debate AI in education with [avatar name]" (max 70 chars)
+- scenario: the debate topic, the learner's position, the AI opponent's position, and their personality/background
+- roles: learner = debater defending their assigned position; AI = debater arguing the opposing view
+- learnerInstructions: the topic, their assigned position, that they need to construct logical arguments and challenge the opponent respectfully, max 80 words
+
+---
+
+**8. Professional Conversations Roleplay** | 15–30 mins
+Good for: apprenticeships, EPA professional discussions, media training, academic interviews, structured professional practice.
+Key fields:
+- title: e.g. "Making the grade: take on your professional discussion" (max 70 chars)
+- scenario: type of conversation (e.g. EPA professional discussion, media interview, Oxbridge interview), the interviewer's role, and 3–5 suggested questions
+- roles: learner = interviewee; AI = interviewer (describe personality/style)
+- learnerInstructions: the scenario context, what they need to demonstrate, max 80 words
+
+---
+
+### QUIZZES
+4–6 multiple choice questions, one correct answer. Duration: 5 mins.
+
+### QUESTIONNAIRES
+3–5 open-ended reflection prompts. Duration: 5 mins.
 
 ---
 
 ## OUTPUT RULES
 
-CRITICAL: Only use modules, exercises, simulators, quizzes, and questionnaires listed above. Nothing else.
+CRITICAL: Only use content from the Bodyswaps library above. Nothing invented outside this list.
 
-For simulators, provide a brief customisation note (2-3 sentences) explaining how to configure it for this specific learner group and context.
+For SIMULATORS: Populate all 4 simulatorFields keys (title, scenario, roles, learnerInstructions) with specific, realistic content tailored to this learner group. Do not write generic placeholders.
 
-For quizzes, list 4-6 multiple choice questions with correct answer marked.
+For QUIZZES: List 4–6 multiple choice questions with correct answer marked.
 
-For questionnaires, list 3-5 open-ended reflection prompts.
+For QUESTIONNAIRES: List 3–5 open-ended reflection prompts.
 
 ## OUTPUT FORMAT
 
-Respond ONLY with valid JSON in this exact format — no preamble, no markdown, no backticks:
+Respond ONLY with valid JSON — no preamble, no markdown, no backticks:
 
 {
   "title": "Pathway title (compelling, specific)",
@@ -1267,7 +1347,12 @@ Respond ONLY with valid JSON in this exact format — no preamble, no markdown, 
       "name": "Exact name from library",
       "description": "1-2 sentences on what learners will do/practice",
       "duration": "X mins",
-      "customisation": "Only for Simulators: brief note on how to customise for this group (omit this key for other types)",
+      "simulatorFields": {
+        "title": "Snappy scenario title",
+        "scenario": "Who the AI is, what the situation is, key context details",
+        "roles": "Learner = [their role]. AI = [character name, personality, background]",
+        "learnerInstructions": "What to do, who they're speaking to, skills to use. Max 80 words."
+      },
       "quizQuestions": [
         {"question": "...", "options": ["A", "B", "C", "D"], "correct": "A"}
       ],
@@ -1275,6 +1360,66 @@ Respond ONLY with valid JSON in this exact format — no preamble, no markdown, 
     }
   ]
 }`;
+
+---
+
+## CONTENT LIBRARY
+
+### MODULES (scripted, fixed content – cannot be adapted)
+Only use modules from this list:
+
+1. **Active Listening** | 15 mins | Identify good/bad listening, use thoughtful questions, summarising technique. Good for: communication, empathy, healthcare, workplace.
+2. **Clear Communications** | 15 mins | Build a compelling case, avoid communication pitfalls, give convincing explanations. Good for: workplace communication, assertiveness.
+3. **Workplace Communication** | 50 mins | Game show format. Topics: non-verbal comms, clarity & concision, active listening, persuasion. Good for: general comms, early careers, employability.
+4. **Talented Teamwork** | 25 mins | Team player styles, team-busting behaviours, collaborative relationships. Good for: teamwork, collaboration, management.
+5. **Negotiation and Conflict Management: Laying the Groundwork** | 25 mins | Small talk, rapport building, active listening in negotiation contexts. Good for: negotiation, conflict, management.
+6. **Negotiation and Conflict Management: Approach and Mindset** | 25 mins | Managing emotions, win-win mindset, understanding others. Good for: negotiation, conflict, emotional intelligence.
+7. **Negotiation and Conflict Management: Gaining Influence and Value** | 25 mins | Influencing without power, tangible/intangible interests, trading issues. Good for: negotiation, influence, leadership.
+8. **Public Speaking and Presentation Skills** | ~40 mins | Composure, body language, voice, charisma, structure. Good for: presentation skills, communication, confidence.
+9. **Managing Interview Anxiety** | 15 mins | Guided meditation, grounding techniques, identifying feelings. Good for: employability, confidence, wellbeing.
+10. **Landing the Perfect Job** | 20 mins | Crafting compelling answers, identifying strengths and non-negotiables. Good for: employability, job readiness.
+11. **Two Strategies for Answering Almost Any Question (CAR/STAR)** | 20 mins | Story bank, CAR technique, STAR technique. Good for: employability, interview skills.
+12. **Bias as a Barrier** | 25 mins | Unconscious bias, challenging assumptions, stop/switch/challenge/counter strategy. Good for: DEI, inclusion, awareness.
+13. **Navigating Microaggressions** | 25 mins | Types of microaggression, stepping up, standing up to microaggressions. Good for: DEI, allyship, inclusion.
+14. **Recognising Privilege** | 25 mins | Privilege and race, identifying privilege, myth of meritocracy. Good for: DEI, inclusion, awareness.
+15. **Navigating Angry Conversations (Healthcare)** | 30 mins | Calming techniques, depersonalisation, identifying anger signals, defusing anger with empathy. Good for: healthcare, de-escalation, patient comms.
+16. **Communicating in a Person-Centred Way: Acting with Empathy** | 20 mins | Dignity, promoting respect, involving family members, demonstrating empathy. Good for: healthcare, care settings.
+17. **Communicating in a Person-Centred Way: Getting to Know Each Individual** | 20 mins | Person-centred approach, curiosity, unique identity, individuality. Good for: healthcare, care settings.
+18. **Growth Mindset and Resilience** | 60 mins | Purpose statement, best future self, resilience, recovering from setbacks, positive self-talk. Good for: employability, wellbeing, early careers.
+19. **TeamSTEPPS: Call-Out** | 15 mins | Practice call-out communication strategy. Good for: healthcare, clinical teamwork.
+20. **TeamSTEPPS: Check-Back** | 15 mins | Explore and practice check-back communication. Good for: healthcare, clinical teamwork.
+21. **TeamSTEPPS: CUS** | 15 mins | Understanding CUS formula, escalating concerns. Good for: healthcare, clinical teamwork, patient safety.
+22. **TeamSTEPPS: SBAR** | 15 mins | SBAR structure, practice using SBAR. Good for: healthcare, handovers, clinical communication.
+23. **TeamSTEPPS: Task Assistance** | 15 mins | Supportive and unsupportive behaviors, demonstrating task assistance. Good for: healthcare, clinical teamwork.
+24. **Using Values to Guide Actions** | 25 mins | Values in workplace, values-driven behaviours, navigating difficult conversations. Good for: healthcare, organisational culture.
+25. **Verbal De-escalation of Responsive Behaviours** | 25 mins | De-escalation with Nancy (Alzheimer's), de-escalation with Johnny (autism). Good for: care homes, residential care.
+
+---
+
+### EXERCISES (scripted, fixed content – cannot be adapted)
+- **Guided Meditation** | 5 mins | Power pose and breathing for calm. Category: Wellbeing/Confidence.
+- **Identifying Strengths and Non-Negotiables** | 5 mins | Mini personality test. Category: Self-awareness/Employability.
+- **Reflecting on Challenging Patient Interactions** | 5 mins | Freeform reflection on angry encounters. Category: Healthcare.
+- **Personal Calming Techniques** | 5 mins | Three calming techniques for hostile situations. Category: Healthcare/Wellbeing.
+- **Understanding Different Types of Team Players** | 8 mins | Identify own team player style. Category: Teamwork.
+- **Good and Bad Teamwork** | 5 mins | Identify team-busting behaviours. Category: Teamwork.
+- **Learn How to Collaborate with Others** | 8 mins | Participate in a team meeting. Category: Teamwork.
+- **Preparing Interview Stories** | 8 mins | Build a story bank. Category: Employability.
+- **Crafting Interview Answers with CAR** | 8 mins | Learn and apply CAR technique. Category: Employability.
+- **Crafting Interview Answers with STAR** | 8 mins | Learn and apply STAR technique. Category: Employability.
+- **Public Speaking: Grounding Yourself** | 5 mins | 5-4-3-2-1 grounding technique. Category: Confidence/Public speaking.
+- **Public Speaking: Finding Your Voice** | 5 mins | Discover authentic speaking style. Category: Public speaking.
+- **Public Speaking: The Importance of Body Language** | 5 mins | Identify good/bad non-verbal cues. Category: Public speaking.
+- **Public Speaking: Adjusting Your Pace** | 5 mins | Explore verbal pacing. Category: Public speaking.
+- **Public Speaking: Warm Up Your Voice** | 5 mins | Vocal warm-up exercises. Category: Public speaking.
+
+---
+
+
+
+---
+
+
 
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -1536,7 +1681,35 @@ function renderPathway(pathway) {
 
     // Build expandable extra content for quizzes / questionnaires / simulators
     let extraHtml = '';
-    if (unit.customisation) {
+
+    // Rich simulator fields (simplified: title, scenario, roles, learnerInstructions)
+    if (unit.type === 'Simulator' && unit.simulatorFields) {
+      const sf = unit.simulatorFields;
+      const fieldMap = [
+        { key: 'title',               label: 'Title' },
+        { key: 'scenario',            label: 'Scenario & context' },
+        { key: 'roles',               label: 'Roles' },
+        { key: 'learnerInstructions', label: 'Learner instructions' },
+      ];
+      let fieldsHtml = fieldMap
+        .filter(({ key }) => sf[key])
+        .map(({ key, label }) => `
+          <div class="sim-field">
+            <div class="sim-field-label">${label}</div>
+            <div class="sim-field-value">${sf[key]}</div>
+          </div>`).join('');
+
+      if (fieldsHtml) {
+        extraHtml += `
+          <div class="unit-extra sim-setup">
+            <span class="extra-label">⚙️ Bodyswaps Go setup</span>
+            <div class="sim-fields-list">${fieldsHtml}</div>
+          </div>`;
+      }
+    }
+
+    // Fallback: legacy customisation string
+    if (!unit.simulatorFields && unit.customisation) {
       extraHtml += `<div class="unit-extra customisation">
         <span class="extra-label">⚙️ Customise</span>
         <p>${unit.customisation}</p>

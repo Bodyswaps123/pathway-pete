@@ -1423,6 +1423,23 @@ Only use modules from this list:
 `;
 
 // ═══════════════════════════════════════════════════════════════
+// BLOCKED PERSONAL EMAIL DOMAINS
+// ═══════════════════════════════════════════════════════════════
+const BLOCKED_DOMAINS = [
+  'gmail.com','googlemail.com','yahoo.com','yahoo.co.uk','yahoo.fr',
+  'hotmail.com','hotmail.co.uk','hotmail.fr','outlook.com','outlook.co.uk',
+  'live.com','live.co.uk','msn.com','icloud.com','me.com','mac.com',
+  'aol.com','protonmail.com','proton.me','tutanota.com','zoho.com',
+  'yandex.com','yandex.ru','mail.com','gmx.com','gmx.net',
+  'fastmail.com','hey.com','pm.me'
+];
+
+function isPersonalEmail(email) {
+  const domain = email.split('@')[1]?.toLowerCase();
+  return BLOCKED_DOMAINS.includes(domain);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════
 function nextStep(n) {
@@ -1434,6 +1451,12 @@ function nextStep(n) {
     const em = document.getElementById('userEmail').value.trim();
     if (!fn || !ln || !org || !em) {
       document.getElementById('detailsError').classList.remove('hidden');
+      document.getElementById('detailsError').textContent = 'Please fill in your name, organisation and email to continue.';
+      return;
+    }
+    if (isPersonalEmail(em)) {
+      document.getElementById('detailsError').classList.remove('hidden');
+      document.getElementById('detailsError').textContent = 'Please use your work email address to continue — personal email addresses are not supported.';
       return;
     }
     document.getElementById('detailsError').classList.add('hidden');

@@ -1866,8 +1866,15 @@ async function requestLibrary() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email:        ud.email || '',
-        pathwayTitle: state.generatedPathway?.title || ''
+        firstName:          ud.firstName                          || '',
+        lastName:           ud.lastName                           || '',
+        email:              ud.email                              || '',
+        org:                ud.org                                || '',
+        jobRole:            ud.jobRole                            || '',
+        industry:           state.industry                        || '',
+        pathwayTitle:       state.generatedPathway?.title         || '',
+        pathwayDescription: state.generatedPathway?.description   || '',
+        units:              state.generatedPathway?.units         || []
       })
     });
   } catch (e) {

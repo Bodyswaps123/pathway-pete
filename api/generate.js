@@ -17,18 +17,24 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
+        model: 'claude-sonnet-4-5',
+        max_tokens: 4000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }]
       })
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Anthropic API error:', response.status, errorText);
+      return res.status(500).json({ error: 'Anthropic API error', detail: errorText });
+    }
 
     const data = await response.json();
     return res.status(200).json(data);
 
   } catch (err) {
     console.error('Generate error:', err);
-    return res.status(500).json({ error: 'Failed to generate pathway' });
+    return res.status(500).json({ error: 'Failed to generate pathway', detail: err.message });
   }
 }

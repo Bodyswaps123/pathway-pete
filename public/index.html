@@ -1123,8 +1123,8 @@
       <div class="module-list" id="moduleList"></div>
 
       <div class="cta-area">
-        <button class="btn-deploy" id="deployBtn" onclick="deployToBodyswaps()">
-          🚀 Create in Bodyswaps Go
+        <button class="btn-deploy" id="deployBtn" onclick="requestLibrary()">
+          📚 Add pathway to your library
         </button>
         <button class="btn-restart" onclick="restart()">
           ↩ Build another
@@ -1134,8 +1134,8 @@
       <div id="successBanner" class="success-banner hidden">
         <div class="success-icon-wrap">✅</div>
         <div>
-          <h4>Created in Bodyswaps Go!</h4>
-          <p>Your pathway draft is ready. Head to Bodyswaps Go to review, customise and publish it to your learners.</p>
+          <h4>We're adding your pathway to your library!</h4>
+          <p>A member of the Bodyswaps team will be in touch shortly to confirm once your pathway is live and ready for your learners.</p>
         </div>
       </div>
     </div>
@@ -1803,21 +1803,31 @@ function renderPathway(pathway) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// DEPLOY
+// REQUEST LIBRARY
 // ═══════════════════════════════════════════════════════════════
-function deployToBodyswaps() {
+async function requestLibrary() {
   const btn = document.getElementById('deployBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ Creating…';
+  btn.textContent = '⏳ Requesting…';
 
-  // In production: POST state.generatedPathway to Bodyswaps Go API
-  // e.g. await fetch('https://api.bodyswaps.co/v1/pathways', { method: 'POST', body: JSON.stringify(state.generatedPathway) })
+  const ud = state.userDetails || {};
 
-  setTimeout(() => {
-    document.getElementById('successBanner').classList.remove('hidden');
-    btn.textContent = '✓ Created in Bodyswaps Go';
-    btn.style.background = '#1a9e6f';
-  }, 1500);
+  try {
+    await fetch('/api/request-library', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email:        ud.email || '',
+        pathwayTitle: state.generatedPathway?.title || ''
+      })
+    });
+  } catch (e) {
+    console.error('Library request error:', e);
+  }
+
+  btn.textContent = "✓ We're on it!";
+  btn.style.background = '#1a9e6f';
+  document.getElementById('successBanner').classList.remove('hidden');
 }
 
 // ═══════════════════════════════════════════════════════════════

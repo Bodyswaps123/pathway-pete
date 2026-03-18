@@ -13,8 +13,19 @@ export default async function handler(req, res) {
   };
 
   try {
-    const { firstName, lastName, email, org, jobRole, industry, pathwayTitle, pathwaySummary } = req.body;
+    const {
+      firstName, lastName, email, org, jobRole,
+      industry, pathwayTitle, pathwaySummary, units
+    } = req.body;
 
+    // ── Build unit list for note ──────────────────────────────
+    const unitLines = (units || []).map((u, i) =>
+      `  ${i + 1}. [${u.type}] ${u.name || u.title || 'Untitled'} (${u.duration || '?'})`
+    ).join('\n');
+
+    const unitCount = (units || []).length;
+
+    // ── Upsert contact + write Pathway Pete properties ────────
     const upsertRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert', {
       method: 'POST',
       headers,
@@ -23,11 +34,18 @@ export default async function handler(req, res) {
           idProperty: 'email',
           id: email,
           properties: {
+            // Standard properties
             firstname: firstName || '',
             lastname:  lastName  || '',
             email:     email     || '',
             company:   org       || '',
             jobtitle:  jobRole   || '',
+
+            // Pathway Pete properties
+            pathway_pete_last_title:          pathwayTitle || '',
+            pathway_pete_last_industry:       industry     || '',
+            pathway_pete_last_generated_date: new Date().toISOString().split('T')[0],
+            pathway_pete_last_unit_count:     String(unitCount),
           }
         }]
       })
@@ -37,18 +55,44 @@ export default async function handler(req, res) {
     const contactId = upsertData.results?.[0]?.id;
     if (!contactId) return res.status(200).json({ ok: true, warning: 'No contact ID' });
 
+    // ── Increment pathway count ───────────────────────────────
+    // Fetch current count first, then increment
+    const contactRes = await fetch(
+      `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}?properties=pathway_pete_count`,
+      { headers }
+    );
+    const contactData = await contactRes.json();
+    const currentCount = parseInt(contactData.properties?.pathway_pete_count || '0', 10);
+    const newCount = currentCount + 1;
+
+    await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({
+        properties: { pathway_pete_count: String(newCount) }
+      })
+    });
+
+    // ── Create rich note ──────────────────────────────────────
     const noteBody = [
-      `📋 PATHWAY BUILDER SUBMISSION`,
+      `🗺️ PATHWAY PETE — PATHWAY #${newCount} GENERATED`,
       ``,
-      `Title: ${pathwayTitle || 'Untitled pathway'}`,
-      `Learner industry: ${industry || 'Not specified'}`,
-      `Organisation: ${org || 'Not specified'}`,
-      `Requestor: ${firstName} ${lastName}${jobRole ? ` — ${jobRole}` : ''}`,
+      `CONTACT`,
+      `  Name:         ${firstName} ${lastName}`,
+      `  Organisation: ${org || '—'}`,
+      `  Job role:     ${jobRole || '—'}`,
+      `  Industry:     ${industry || '—'}`,
       ``,
-      `── PATHWAY CONTENT ──`,
-      pathwaySummary || 'No summary available',
+      `PATHWAY`,
+      `  Title:        ${pathwayTitle || 'Untitled'}`,
+      `  Units:        ${unitCount}`,
+      `  Generated:    ${new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' })}`,
       ``,
-      `Submitted via Bodyswaps Pathway Builder`,
+      `UNITS`,
+      unitLines || '  No units available',
+      ``,
+      `─────────────────────────────────`,
+      `Submitted via Bodyswaps Pathway Pete`,
     ].join('\n');
 
     await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
@@ -66,7 +110,7 @@ export default async function handler(req, res) {
       })
     });
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, pathwayCount: newCount });
 
   } catch (err) {
     console.error('submit-lead error:', err);

@@ -1412,6 +1412,14 @@ Only use modules from this list:
 - **Public Speaking: The Importance of Body Language** | 5 mins | Identify good/bad non-verbal cues. Category: Public speaking.
 - **Public Speaking: Adjusting Your Pace** | 5 mins | Explore verbal pacing. Category: Public speaking.
 - **Public Speaking: Warm Up Your Voice** | 5 mins | Vocal warm-up exercises. Category: Public speaking.
+
+---
+
+
+
+---
+
+
 `;
 
 // ═══════════════════════════════════════════════════════════════
@@ -1592,6 +1600,7 @@ async function generatePathway() {
     const pathwaySummary = (pathway.units || []).map((u, i) =>
       `${i+1}. [${u.type}] ${u.title}${u.duration ? ' (' + u.duration + ')' : ''}${u.customisation ? ' — ' + u.customisation : ''}`
     ).join('\n');
+    // Submit lead to HubSpot
     fetch('/api/submit-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1605,7 +1614,40 @@ async function generatePathway() {
         pathwayTitle:   pathway.title     || '',
         pathwaySummary: pathwaySummary    || ''
       })
-    }).catch(() => {}); // silent fail
+    }).catch(() => {});
+
+    // Slack notification
+    fetch('/api/notify-slack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName:     ud.firstName || '',
+        lastName:      ud.lastName  || '',
+        email:         ud.email     || '',
+        org:           ud.org       || '',
+        jobRole:       ud.jobRole   || '',
+        industry:      state.industry   || '',
+        pathwayTitle:  pathway.title    || '',
+        units:         pathway.units    || []
+      })
+    }).catch(() => {});
+
+    // Send emails via Resend
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName:           ud.firstName          || '',
+        lastName:            ud.lastName           || '',
+        email:               ud.email              || '',
+        org:                 ud.org                || '',
+        jobRole:             ud.jobRole            || '',
+        industry:            state.industry        || '',
+        pathwayTitle:        pathway.title         || '',
+        pathwayDescription:  pathway.description   || '',
+        units:               pathway.units         || []
+      })
+    }).catch(() => {});
 
   } catch (err) {
     console.error(err);

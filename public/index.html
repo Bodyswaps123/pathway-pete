@@ -1120,6 +1120,14 @@
 
       <div class="pathway-summary-bar" id="pathwaySummaryBar"></div>
 
+      <div id="pathwayRationale" class="hidden" style="background:linear-gradient(135deg,rgba(27,49,72,0.06),rgba(229,131,5,0.06));border:1.5px solid rgba(229,131,5,0.2);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:16px;">🧠</span>
+          <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--bs-orange);">Why this pathway works for you</span>
+        </div>
+        <p id="pathwayRationaleText" style="font-size:14px;color:var(--bs-text);line-height:1.65;margin:0;"></p>
+      </div>
+
       <div class="module-list" id="moduleList"></div>
 
       <div class="cta-area">
@@ -1170,6 +1178,8 @@ const SYSTEM_PROMPT = `You are Pathway Pete, a Bodyswaps Learning Design Expert.
 Based on the user's submission, build a structured learning pathway using ONLY content from the Bodyswaps library listed below. Output a pathway in the exact JSON format specified.
 
 IMPORTANT — LENGTH OVERRIDE RULE: If the user's additional context explicitly requests AI roleplays, simulators, or practice scenarios, you MUST include at least one simulator even if they selected "Short Sprint". A short pathway with a simulator is better than one without.
+
+IMPORTANT — ACTIVE PRACTICE RULE: If the user selected "Active Practice" as their learning mode, the pathway MUST start with a Simulator as the very first unit. Do NOT place any Modules or Exercises before it. The structure should be: Simulator first → Questionnaire or Quiz to reflect → more Simulators if the pathway is longer. Active Practice means learning by doing — jump straight in.
 
 ---
 
@@ -1341,12 +1351,14 @@ Respond ONLY with valid JSON — no preamble, no markdown, no backticks:
   "totalDuration": "X hours Y mins",
   "level": "Foundation|Intermediate|Advanced",
   "targetAudience": "Brief description of who this is for",
+  "rationale": "3-4 sentences explaining exactly why this pathway was designed for these specific learners and goals. Reference their actual context, industry and objectives. Make it feel personal and consultative — like a learning designer explaining their thinking.",
   "units": [
     {
       "type": "Module|Exercise|Simulator|Quiz|Questionnaire",
       "name": "Exact name from library",
       "description": "1-2 sentences on what learners will do/practice",
       "duration": "X mins",
+      "simulatorType": "Exact simulator type name e.g. 'Open Conversation Roleplay' or 'Job Interview Roleplay'",
       "simulatorFields": {
         "title": "Snappy scenario title",
         "scenario": "Who the AI is, what the situation is, key context details",
@@ -1720,6 +1732,14 @@ function renderPathway(pathway) {
 
   document.getElementById('pathwayDesc').textContent = pathway.description || '';
 
+  // Rationale
+  const rationaleEl = document.getElementById('pathwayRationale');
+  const rationaleText = document.getElementById('pathwayRationaleText');
+  if (pathway.rationale) {
+    rationaleText.textContent = pathway.rationale;
+    rationaleEl.classList.remove('hidden');
+  }
+
   // Units
   const list = document.getElementById('moduleList');
   list.innerHTML = '';
@@ -1743,6 +1763,12 @@ function renderPathway(pathway) {
     // Rich simulator fields (simplified: title, scenario, roles, learnerInstructions)
     if (unit.type === 'Simulator' && unit.simulatorFields) {
       const sf = unit.simulatorFields;
+      if (unit.simulatorType) {
+        extraHtml += `<div class="unit-extra" style="padding:8px 16px 0 16px;">
+          <span class="extra-label">Simulator type</span>
+          <span style="font-size:13px;font-weight:600;color:var(--bs-orange);">${unit.simulatorType}</span>
+        </div>`;
+      }
       const fieldMap = [
         { key: 'title',               label: 'Title' },
         { key: 'scenario',            label: 'Scenario & context' },
